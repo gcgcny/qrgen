@@ -159,8 +159,6 @@
             drawRoundedSquare(x, y, 3 * scale, 0, cornerRadius / 2);
         }
 
-        // Call the function with the desired text and path to your logo
-        generateQRCodeWithCustomDesign('https://gcgcny.link/', '#B41337');
 
         document.getElementById('qrForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -208,6 +206,8 @@
             if (url) {
                 document.getElementById('urlInput').value = url;
                 generateQRCodeWithCustomDesign(url, '#B41337');
+            } else {
+                generateQRCodeWithCustomDesign('https://gcgcny.link/', '#B41337');
             }
         }
 

@@ -139,6 +139,13 @@
             generateQRCodeWithCustomDesign(url);
         });
 
+        document.getElementById('urlInput').addEventListener('click', function () {
+            // if empty, add https://gcgcny.link/
+            if (document.getElementById('urlInput').value == '') {
+                document.getElementById('urlInput').value = 'https://gcgcny.link/';
+            }
+        });
+
         document.getElementById('downloadBtn').addEventListener('click', function () {
             const canvas = document.getElementById('canvas');
             const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");

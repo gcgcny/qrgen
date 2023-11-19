@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <title>QR Code Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <style>
+    </style>
 </head>
 
 <body>
@@ -16,7 +18,16 @@
                     <label for="urlInput">Enter URL:</label>
                     <input class="u-full-width" type="text" id="urlInput"
                         placeholder="https://gcgcny.link/announcement">
-                    <button class="button-primary" type="submit">Generate QR Code</button>
+
+                    <label>Select colour:</label>
+                    <div class="color-selector">
+                        <button class="color-button" data-color="#B41337"
+                            style="background-color: #B41337; color: white;">Generate in GCGC Red</button>
+                        <button class="color-button" data-color="#0029B2"
+                            style="background-color: #0029B2; color: white;">Generate in GCGC Blue</button>
+                    </div>
+
+                    <!-- <button id="btnGenerate" class="button-primary" type="submit" style="margin-top: 20px">Generate QR Code</button> -->
                 </form>
                 <div>
                     <canvas id="canvas"></canvas>
@@ -29,9 +40,25 @@
 
     <script src="qrcodegen-v1.8.0-es6.js"></script>
     <script>
-        const clr = '#841337';
 
-        function generateQRCodeWithCustomDesign(text) {
+        function generateQRCodeWithCustomDesign(text, clr) {
+            const svgData = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+                        <svg width="100%" height="100%" viewBox="0 0 936 930" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+                            <g transform="matrix(33.2038,0,0,33.2038,4.61216e-06,0)">
+                                <path d="M27.806,17.52L23.622,14.268L15.085,7.625L15.085,4.501L16.701,4.501C17.247,4.501 17.693,4.055 17.693,3.51C17.693,2.965 17.247,2.518 16.701,2.518L15.085,2.518L15.085,0.992C15.085,0.446 14.639,0 14.094,0C13.548,0 13.102,0.446 13.102,0.992L13.102,2.518L11.486,2.518C10.941,2.518 10.495,2.965 10.495,3.51C10.495,4.055 10.941,4.501 11.486,4.501L13.102,4.501L13.102,7.625L4.555,14.268L0.381,17.52C-0.055,17.857 -0.125,18.482 0.213,18.908C0.411,19.156 0.698,19.295 0.996,19.295C1.204,19.295 1.422,19.225 1.601,19.086L4.179,17.074L4.179,26.999C4.179,27.544 4.625,27.99 5.17,27.99C5.715,27.99 6.162,27.544 6.162,26.999L6.162,15.537L14.094,9.37L22.026,15.537L22.026,27.009C22.026,27.554 22.472,28 23.017,28C23.562,28 24.009,27.554 24.009,27.009L24.009,17.084L26.587,19.096C26.765,19.235 26.983,19.305 27.191,19.305C27.489,19.305 27.776,19.176 27.975,18.918C28.312,18.482 28.232,17.867 27.806,17.53L27.806,17.52Z" style="fill:${clr};fill-rule:nonzero;"/>
+                            </g>
+                            <g transform="matrix(33.2038,0,0,33.2038,4.61216e-06,0)">
+                                <path d="M18.327,16.945C17.296,15.914 15.63,15.914 14.599,16.945L14.391,17.153C14.223,17.322 13.955,17.322 13.796,17.153L13.647,17.004C12.666,16.033 11.089,15.894 10.029,16.786C8.829,17.798 8.769,19.592 9.85,20.673L10.356,21.179L13.786,24.609C13.955,24.778 14.223,24.778 14.381,24.609L17.812,21.179L18.317,20.673C19.349,19.642 19.349,17.976 18.317,16.945L18.327,16.945Z" style="fill:${clr};fill-rule:nonzero;"/>
+                            </g>
+                            <g transform="matrix(33.2038,0,0,33.2038,4.61216e-06,0)">
+                                <path d="M23.017,12.186C23.781,12.186 24.395,11.571 24.395,10.807C24.395,10.044 23.781,9.429 23.017,9.429C22.254,9.429 21.639,10.044 21.639,10.807C21.639,11.571 22.254,12.186 23.017,12.186Z" style="fill:${clr};fill-rule:nonzero;"/>
+                            </g>
+                            <g transform="matrix(33.2038,0,0,33.2038,4.61216e-06,0)">
+                                <path d="M5.17,12.186C5.934,12.186 6.548,11.571 6.548,10.807C6.548,10.044 5.934,9.429 5.17,9.429C4.407,9.429 3.792,10.044 3.792,10.807C3.792,11.571 4.407,12.186 5.17,12.186Z" style="fill:${clr};fill-rule:nonzero;"/>
+                            </g>
+                        </svg>`;
+
             let ecc;
             if (text.length < 25) {
                 ecc = qrcodegen.QrCode.Ecc.HIGH;
@@ -64,15 +91,17 @@
             }
 
             // Draw finder patterns
-            drawFinderPattern(3.5 * scale, 3.5 * scale, scale, ctx); // Top-left
-            drawFinderPattern((qr.size - 3.5 + border) * scale, 3.5 * scale, scale, ctx); // Top-right
-            drawFinderPattern(3.5 * scale, (qr.size - 3.5 + border) * scale, scale, ctx); // Bottom-left
+            drawFinderPattern(3.5 * scale, 3.5 * scale, scale, ctx, clr); // Top-left
+            drawFinderPattern((qr.size - 3.5 + border) * scale, 3.5 * scale, scale, ctx, clr); // Top-right
+            drawFinderPattern(3.5 * scale, (qr.size - 3.5 + border) * scale, scale, ctx, clr); // Bottom-left
 
             // Insert logo
-            const imgScale = scale * logoSize * 1.5; // Adjust logo size
+            const imgScale = scale * logoSize * 1.3; // Adjust logo size
             const logo = new Image();
-            logo.src = 'gcgcnylogo.png';
+            logo.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+
             logo.onload = () => {
+                // Draw the image on canvas with specified width and height
                 ctx.drawImage(logo, canvas.width / 2 - imgScale / 2, canvas.height / 2 - imgScale / 2, imgScale, imgScale);
             };
         }
@@ -88,7 +117,7 @@
             return x > size / 2 - logoSize && x < size / 2 + logoSize - 1 && y > size / 2 - logoSize && y < size / 2 + logoSize - 1;
         }
 
-        function drawFinderPattern(x, y, scale, ctx) {
+        function drawFinderPattern(x, y, scale, ctx, clr) {
             const outerSize = 7 * scale; // Size of the outer rounded square
             const innerSize = 5 * scale; // Size of the inner rounded square
             const cornerRadius = scale; // Radius of the corners
@@ -131,12 +160,19 @@
         }
 
         // Call the function with the desired text and path to your logo
-        generateQRCodeWithCustomDesign('https://gcgcny.link');
+        generateQRCodeWithCustomDesign('https://gcgcny.link/', '#B41337');
 
         document.getElementById('qrForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            const url = document.getElementById('urlInput').value;
-            generateQRCodeWithCustomDesign(url);
+        });
+
+        document.querySelectorAll('.color-button').forEach(item => {
+            item.addEventListener('click', event => {
+                const clr = event.target.dataset.color;
+                console.log(clr);
+                const url = document.getElementById('urlInput').value;
+                generateQRCodeWithCustomDesign(url, clr);
+            })
         });
 
         document.getElementById('urlInput').addEventListener('click', function () {
@@ -171,7 +207,7 @@
             const url = getUrlFromHash();
             if (url) {
                 document.getElementById('urlInput').value = url;
-                generateQRCodeWithCustomDesign(url);
+                generateQRCodeWithCustomDesign(url, '#B41337');
             }
         }
 

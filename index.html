@@ -32,7 +32,16 @@
         const clr = '#841337';
 
         function generateQRCodeWithCustomDesign(text) {
-            const qr = qrcodegen.QrCode.encodeText(text, qrcodegen.QrCode.Ecc.MEDIUM);
+            let ecc;
+            if (text.length < 25) {
+                ecc = qrcodegen.QrCode.Ecc.HIGH;
+            } else if (text.length <= 45) {
+                ecc = qrcodegen.QrCode.Ecc.QUARTILE;
+            } else {
+                ecc = qrcodegen.QrCode.Ecc.MEDIUM;
+            }
+
+            const qr = qrcodegen.QrCode.encodeText(text, ecc);
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             const scale = 20; // Size of each 'circle' pixel

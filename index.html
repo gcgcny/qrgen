@@ -3,9 +3,17 @@
 
 <head>
     <meta charset="utf-8">
-    <title>QR Code Generator</title>
+    <title>GCGCNY QR Code Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     <style>
+        #downloadBtn,#copyBtn {
+            display: flex;
+            /* Enable flexbox */
+            align-items: center;
+            /* Vertically center items in the button */
+            justify-content: center;
+            /* Horizontally center content */
+        }
     </style>
 </head>
 
@@ -33,7 +41,9 @@
                     <canvas id="canvas"></canvas>
                 </div>
 
-                <button id="downloadBtn" style="margin-top: 20px;">Download QR Code</button>
+                <button id="downloadBtn" style="margin-top: 20px;"><img style="height: 1.5em; margin-right: 0.5em;"
+                        src="noun-download-1132114.svg">Download QR Code</button>
+                <button id="copyBtn" style="margin-top: 20px;"><img style="height: 1.5em; margin-right: 0.5em;" src="noun-clipboard-6292276.svg">Copy QR Code to clipboard</button>
             </div>
         </div>
     </div>
@@ -187,6 +197,14 @@
             link.download = 'qr-code.png';
             link.href = image;
             link.click();
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', function () {
+            const canvas = document.getElementById('canvas');
+            canvas.toBlob(function (blob) {
+                const item = new ClipboardItem({ "image/png": blob });
+                navigator.clipboard.write([item]);
+            }, 'image/png');
         });
 
         // Function to extract URL from the hash

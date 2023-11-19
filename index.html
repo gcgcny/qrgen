@@ -39,6 +39,12 @@
                     <input class="u-full-width" type="text" id="urlInput"
                         placeholder="https://gcgcny.link/announcement">
 
+                    <!-- checkbox -->
+                    <div class="checkbox">
+                        <input type="checkbox" id="urlText" name="urlText" value="urlText" checked>
+                        <span>Include URL as text</span>
+                    </div>
+
                     <label>Select colour:</label>
                     <div class="color-selector">
                         <button class="color-button" data-color="#B41337"
@@ -103,8 +109,10 @@
             const border = 0; // Border size
             const logoSize = qr.size * 0.15;
 
+            const includeText = document.getElementById('urlText').checked;
+
             canvas.width = (qr.size + border * 2) * scale;
-            canvas.height = canvas.width + 5 * scale;
+            canvas.height = canvas.width + (includeText ? 5 * scale : 0);
 
             // Draw QR code with circular pixels
             ctx.fillStyle = clr;

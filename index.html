@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="twelve columns">
+                <h4>QR Code Generator</h4>
+                <form id="qrForm">
+                    <label for="urlInput">Enter URL:</label>
+                    <input class="u-full-width" type="text" id="urlInput"
+                        placeholder="https://gcgcny.link/announcement">
+                    <button class="button-primary" type="submit">Generate QR Code</button>
+                </form>
+                <div>
+                    <canvas id="canvas"></canvas>
+                </div>
+
+                <button id="downloadBtn" style="margin-top: 20px;">Download QR Code</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="qrcodegen-v1.8.0-es6.js"></script>
+    <script>
+        const clr = '#841337';
+
+        function generateQRCodeWithCustomDesign(text) {
+            const qr = qrcodegen.QrCode.encodeText(text, qrcodegen.QrCode.Ecc.MEDIUM);
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const scale = 20; // Size of each 'circle' pixel
+            const border = 0; // Border size
+            const logoSize = qr.size * 0.15;
+
+            canvas.width = (qr.size + border * 2) * scale;
+            canvas.height = canvas.width;
+
+            // Draw QR code with circular pixels
+            ctx.fillStyle = clr;
+            for (let y = 0; y < qr.size; y++) {
+                for (let x = 0; x < qr.size; x++) {
+                    if (qr.getModule(x, y) && !isInFinderPattern(x, y, qr.size) && !isInLogo(x, y, qr.size, logoSize)) {
+                        ctx.beginPath();
+                        ctx.arc((x + border) * scale + scale / 2, (y + border) * scale + scale / 2, scale / 2, 0, Math.PI * 2, false);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // Draw finder patterns
+            drawFinderPattern(3.5 * scale, 3.5 * scale, scale, ctx); // Top-left
+            drawFinderPattern((qr.size - 3.5 + border) * scale, 3.5 * scale, scale, ctx); // Top-right
+            drawFinderPattern(3.5 * scale, (qr.size - 3.5 + border) * scale, scale, ctx); // Bottom-left
+
+            // Insert logo
+            const imgScale = scale * logoSize * 1.5; // Adjust logo size
+            const logo = new Image();
+            logo.src = 'gcgcnylogo.png';
+            logo.onload = () => {
+                ctx.drawImage(logo, canvas.width / 2 - imgScale / 2, canvas.height / 2 - imgScale / 2, imgScale, imgScale);
+            };
+        }
+
+        function isInFinderPattern(x, y, size) {
+            // Adjust these ranges based on your QR code version and finder pattern size
+            const range = 7;
+            return (x < range && y < range) || (x < range && y >= size - range) || (x >= size - range && y < range);
+        }
+
+        function isInLogo(x, y, size, logoSize) {
+            // Adjust these ranges based on your QR code version and logo size
+            return x > size / 2 - logoSize && x < size / 2 + logoSize - 1 && y > size / 2 - logoSize && y < size / 2 + logoSize - 1;
+        }
+
+        function drawFinderPattern(x, y, scale, ctx) {
+            const outerSize = 7 * scale; // Size of the outer rounded square
+            const innerSize = 5 * scale; // Size of the inner rounded square
+            const cornerRadius = scale; // Radius of the corners
+
+            // Function to draw a rounded square
+            function drawRoundedSquare(centerX, centerY, squareSize, innerCutoutSize, cornerRadius) {
+                function drawRoundedRect(x, y, sz, r) {
+                    const hs = sz / 2;
+                    ctx.moveTo(x - hs + r, y - hs);
+                    ctx.arcTo(x + hs, y - hs, x + hs, y + hs, r);
+                    ctx.arcTo(x + hs, y + hs, x - hs, y + hs, r);
+                    ctx.arcTo(x - hs, y + hs, x - hs, y - hs, r);
+                    ctx.arcTo(x - hs, y - hs, x + hs, y - hs, r);
+                }
+
+                // Outer square
+                drawRoundedRect(centerX, centerY, squareSize, cornerRadius);
+
+                // Inner square (cutout)
+                if (innerCutoutSize > 0) {
+                    drawRoundedRect(centerX, centerY, innerCutoutSize, cornerRadius);
+                }
+
+                ctx.fillStyle = clr; // Set the fill style if needed
+                ctx.fill('evenodd'); // Use the even-odd rule to subtract the inner square
+            }
+
+            // Draw outer rounded square (outline)
+            ctx.fillStyle = clr;
+            drawRoundedSquare(x, y, outerSize, innerSize, cornerRadius);
+
+            // Draw inner rounded square
+            // ctx.fillStyle = 'white';
+            // drawRoundedSquare(x, y, innerSize, cornerRadius / 2);
+            // ctx.fill();
+
+            // Optionally add a black center dot
+            ctx.fillStyle = clr;
+            drawRoundedSquare(x, y, 3 * scale, 0, cornerRadius / 2);
+        }
+
+        // Call the function with the desired text and path to your logo
+        generateQRCodeWithCustomDesign('https://gcgcny.link');
+
+        document.getElementById('qrForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            generateQRCodeWithCustomDesign(url);
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            const canvas = document.getElementById('canvas');
+            const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = image;
+            link.click();
+        });
+
+        // Function to extract URL from the hash
+        function getUrlFromHash() {
+            const hash = window.location.hash.substring(1); // Remove the '#' character
+            try {
+                const url = new URL(decodeURIComponent(hash));
+                return url.href; // Return the full URL
+            } catch (e) {
+                return ''; // Return empty string if it's not a valid URL
+            }
+        }
+
+        // Function to update the input box and generate QR Code
+        function updateInputAndGenerateQR() {
+            const url = getUrlFromHash();
+            if (url) {
+                document.getElementById('urlInput').value = url;
+                generateQRCodeWithCustomDesign(url);
+            }
+        }
+
+        // Call the function on page load
+        window.onload = updateInputAndGenerateQR;
+
+    </script>
+</body>
+
+</html>

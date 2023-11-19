@@ -14,6 +14,10 @@
             justify-content: center;
             /* Horizontally center content */
         }
+
+        #canvas {
+            max-width: 300px;
+        }
     </style>
 </head>
 
@@ -85,7 +89,7 @@
             const qr = qrcodegen.QrCode.encodeText(text, ecc);
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
-            const scale = 20; // Size of each 'circle' pixel
+            const scale = 50; // Size of each 'circle' pixel
             const border = 0; // Border size
             const logoSize = qr.size * 0.15;
 

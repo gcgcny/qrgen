@@ -5,8 +5,13 @@
     <meta charset="utf-8">
     <title>QR Code Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+
     <style>
-        #downloadBtn,#copyBtn {
+        #downloadBtn,
+        #copyBtn {
             display: flex;
             /* Enable flexbox */
             align-items: center;
@@ -50,13 +55,15 @@
 
                 <button id="downloadBtn" style="margin-top: 20px;"><img style="height: 1.5em; margin-right: 0.5em;"
                         src="noun-download-1132114.svg">Download QR Code</button>
-                <button id="copyBtn" style="margin-top: 20px;"><img style="height: 1.5em; margin-right: 0.5em;" src="noun-clipboard-6292276.svg">Copy QR Code to clipboard</button>
+                <button id="copyBtn" style="margin-top: 20px;"><img style="height: 1.5em; margin-right: 0.5em;"
+                        src="noun-clipboard-6292276.svg">Copy QR Code to clipboard</button>
             </div>
         </div>
     </div>
 
     <script src="qrcodegen-v1.8.0-es6.js"></script>
     <script>
+        document.fonts.load('10pt "Poppins"')
 
         function generateQRCodeWithCustomDesign(text, clr) {
             const svgData = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -97,7 +104,7 @@
             const logoSize = qr.size * 0.15;
 
             canvas.width = (qr.size + border * 2) * scale;
-            canvas.height = canvas.width;
+            canvas.height = canvas.width + 5 * scale;
 
             // Draw QR code with circular pixels
             ctx.fillStyle = clr;
@@ -123,8 +130,10 @@
 
             logo.onload = () => {
                 // Draw the image on canvas with specified width and height
-                ctx.drawImage(logo, canvas.width / 2 - imgScale / 2, canvas.height / 2 - imgScale / 2, imgScale, imgScale);
+                ctx.drawImage(logo, canvas.width / 2 - imgScale / 2, canvas.width / 2 - imgScale / 2, imgScale, imgScale);
             };
+
+            drawTextOnCanvas(canvas, text, clr);
         }
 
         function isInFinderPattern(x, y, size) {
@@ -180,6 +189,41 @@
             drawRoundedSquare(x, y, 3 * scale, 0, cornerRadius / 2);
         }
 
+        function drawTextOnCanvas(canvas, url, clr) {
+            const ctx = canvas.getContext('2d');
+            const padding = 0; // Padding around the text
+            const initialFontSize = 150; // Initial guess for the font size
+
+            const getFontDetails = fontSize => `600 ${fontSize}px Poppins`;
+
+            // Function to measure text width with current font settings
+            function measureText(text, fontSize) {
+                ctx.font = getFontDetails(fontSize);
+                return ctx.measureText(text).width;
+            }
+
+            // Adjust font size to fit the canvas width
+            let fontSize = initialFontSize;
+            let textWidth = measureText(url, fontSize);
+            while (textWidth > canvas.width - 2 * padding) {
+                fontSize -= 5;
+                textWidth = measureText(url, fontSize);
+            }
+
+            if (url.startsWith('https://')) {
+                url = url.substring(8);
+            }
+            if (url.endsWith('/')) {
+                url = url.substring(0, url.length - 1);
+            }
+
+            // Draw the text at the bottom of the canvas
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = clr; // Change text color if needed
+            ctx.font = getFontDetails(fontSize);
+            ctx.fillText(url, canvas.width / 2, canvas.width + 80);
+        }
 
         document.getElementById('qrForm').addEventListener('submit', function (event) {
             event.preventDefault();

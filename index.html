@@ -23,6 +23,10 @@
         #canvas {
             max-width: 300px;
         }
+
+        body{
+            margin: 75px auto;
+        }
     </style>
 
     <!-- favicon -->
@@ -42,15 +46,17 @@
                     <!-- checkbox -->
                     <div class="checkbox">
                         <input type="checkbox" id="urlText" name="urlText" value="urlText" checked>
-                        <span>Include URL as text</span>
+                        <label style="display: inline; font-weight: normal;" for="urlText">Include URL as text</label>
                     </div>
 
-                    <label>Select colour:</label>
+                    <label style="margin-top: 20px;">Select colour:</label>
                     <div class="color-selector">
                         <button class="color-button" data-color="#B41337"
                             style="background-color: #B41337; color: white;">Generate in GCGC Red</button>
                         <button class="color-button" data-color="#0029B2"
                             style="background-color: #0029B2; color: white;">Generate in GCGC Blue</button>
+                        <button class="color-button" data-color="#000"
+                            style="background-color: #000; color: white;">Generate in black</button>
                     </div>
 
                     <!-- <button id="btnGenerate" class="button-primary" type="submit" style="margin-top: 20px">Generate QR Code</button> -->

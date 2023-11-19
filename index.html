@@ -70,6 +70,10 @@
                         </svg>`;
 
             let ecc;
+            if (text.length == 0) {
+                text = 'https://gcgcny.link/';
+            }
+
             if (text.length < 25) {
                 ecc = qrcodegen.QrCode.Ecc.HIGH;
             } else if (text.length <= 45) {
@@ -225,7 +229,7 @@
                 document.getElementById('urlInput').value = url;
                 generateQRCodeWithCustomDesign(url, '#B41337');
             } else {
-                generateQRCodeWithCustomDesign('https://gcgcny.link/', '#B41337');
+                generateQRCodeWithCustomDesign('', '#B41337');
             }
         }
 

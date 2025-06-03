@@ -24,6 +24,13 @@
             max-width: 300px;
         }
 
+        #canvas-wrapper {
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            display: inline-flex;
+        }
+
         body {
             margin: 75px auto;
         }
@@ -57,11 +64,13 @@
                             style="background-color: #0029B2; color: white;">Generate in GCGC Blue</button>
                         <button class="color-button" data-color="#000"
                             style="background-color: #000; color: white;">Generate in black</button>
+                        <button class="color-button" data-color="#fff" data-bg="#333"
+                            style="background-color: #fff; color: black;">Generate in white</button>
                     </div>
 
                     <!-- <button id="btnGenerate" class="button-primary" type="submit" style="margin-top: 20px">Generate QR Code</button> -->
                 </form>
-                <div>
+                <div id="canvas-wrapper">
                     <canvas id="canvas"></canvas>
                 </div>
 
@@ -276,8 +285,12 @@
                 const clr = event.target.dataset.color;
                 console.log(clr);
                 const url = document.getElementById('urlInput').value;
+
+                const bg = event.target.dataset.bg || '#fff';
+                document.getElementById('canvas-wrapper').style.backgroundColor = bg;
+
                 generateQRCodeWithCustomDesign(url, clr);
-            })
+            });
         });
 
         document.getElementById('urlInput').addEventListener('click', function () {

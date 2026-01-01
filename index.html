@@ -20,6 +20,30 @@
             /* Horizontally center content */
         }
 
+        #copyBtn.copy-success {
+            animation: copyBtnSuccessFlash 600ms ease-in-out;
+        }
+
+        @keyframes copyBtnSuccessFlash {
+            0% {
+                background-color: inherit;
+                border-color: inherit;
+                color: inherit;
+            }
+
+            20% {
+                background-color: #2ecc71;
+                border-color: #2ecc71;
+                color: #fff;
+            }
+
+            100% {
+                background-color: inherit;
+                border-color: inherit;
+                color: inherit;
+            }
+        }
+
         #canvas {
             max-width: 300px;
         }
@@ -310,10 +334,37 @@
         });
 
         document.getElementById('copyBtn').addEventListener('click', function () {
+            const copyBtn = document.getElementById('copyBtn');
             const canvas = document.getElementById('canvas');
+
+            const originalHtml = copyBtn.dataset.originalHtml || copyBtn.innerHTML;
+            copyBtn.dataset.originalHtml = originalHtml;
+
+            const existingTimer = copyBtn.dataset.successTimerId;
+            if (existingTimer) {
+                clearTimeout(Number(existingTimer));
+                copyBtn.dataset.successTimerId = '';
+            }
+
             canvas.toBlob(function (blob) {
+                if (!blob) return;
+
                 const item = new ClipboardItem({ "image/png": blob });
-                navigator.clipboard.write([item]);
+                navigator.clipboard.write([item]).then(() => {
+                    copyBtn.classList.remove('copy-success');
+                    void copyBtn.offsetWidth;
+                    copyBtn.classList.add('copy-success');
+
+                    copyBtn.textContent = '✓ Image Copied';
+
+                    const timerId = window.setTimeout(() => {
+                        copyBtn.innerHTML = copyBtn.dataset.originalHtml;
+                        copyBtn.dataset.successTimerId = '';
+                    }, 2000);
+                    copyBtn.dataset.successTimerId = String(timerId);
+                }).catch(() => {
+                    // No-op: keep existing label if copy fails (e.g. permissions).
+                });
             }, 'image/png');
         });
 
